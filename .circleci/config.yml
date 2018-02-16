@@ -12,6 +12,7 @@ jobs:
           name: echo
           command: |
             echo "Echo inside Redis image"
+
   build:
     docker:
       # specify the version you desire here
@@ -47,11 +48,6 @@ jobs:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
       - run:
           name: run tests
           command: |
@@ -66,28 +62,36 @@ jobs:
       - store_artifacts:
           path: reports
           destination: reports
+
   deploy-prod:
     docker:
-      - image: airhelp/kops: 1.8.0
+      - image: airhelp/kops:1.8.0
         environment:
           AWS_PROFILE: default
           KOPS_STATE_STORE: s3://my-bucket
+
     working_directory: ~/circleci
+
     steps:
       - checkout
+
       - run:
           name: cat requirements file
           command: |
             cat requirements.txt
+
       - setup_remote_docker
+
       - run:
           name: docker command
           command: |
             docker ps
+
       - deploy:
           name: deploy environment
           command: |
             echo "Deploying code to environment"
+
 workflows:
   version: 2
   test_build_deploy:
