@@ -58,14 +58,55 @@ jobs:
             . venv/bin/activate
             python main.py
 
+      - run:
+          name: save test artifacts
+          command: |
+            echo "This is a test report" > reports
+
       - store_artifacts:
           path: reports
           destination: reports
+  deploy:
+    docker:
+      - image: airhelp/kops: 1.8.0
+        environment:
+          AWS_PROFILE: default
+          KOPS_STATE_STORE: s3://my-bucket
+    working_directory: ~/circleci
+    steps:
+      - checkout
+      - run:
+          name: cat requirements file
+          command: |
+            cat requirements.txt
+      - setup_remote_docker
+      - run:
+          name: docker command
+          command: |
+            docker ps
+      - deploy:
+          name: deploy environment
+          command: |
+            echo "Deploying code to environment"
 workflows:
   version: 2
-  one_and_two:
+  test_build:
     jobs:
       - test
       - build:
           requires:
             - test
+ test_deploy:
+    jobs:
+      - hold:
+          type: approval
+          requires:
+            - test
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+                - /release.*/
+          requires:
+            - hold
