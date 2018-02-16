@@ -4,6 +4,14 @@
 #
 version: 2
 jobs:
+  test:
+    docker:
+      - image: redis:4.0.8
+    steps:
+      - run:
+          name: echo
+          command: |
+            echo "Echo inside Redis image"
   build:
     docker:
       # specify the version you desire here
@@ -53,3 +61,11 @@ jobs:
       - store_artifacts:
           path: reports
           destination: reports
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
