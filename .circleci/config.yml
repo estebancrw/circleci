@@ -66,7 +66,7 @@ jobs:
       - store_artifacts:
           path: reports
           destination: reports
-  deploy:
+  deploy-prod:
     docker:
       - image: airhelp/kops: 1.8.0
         environment:
@@ -102,7 +102,7 @@ workflows:
           type: approval
           requires:
             - test
-      - deploy:
+      - deploy-prod:
           filters:
             branches:
               only:
