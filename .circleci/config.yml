@@ -97,13 +97,14 @@ workflows:
   test_build_deploy:
     jobs:
       - test
+      - build:
+          requires:
+            - test
       - hold:
           type: approval
           requires:
             - test
-      - build:
-          requires:
-            - test
+            - build
       - deploy-prod:
           filters:
             branches:
