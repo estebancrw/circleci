@@ -90,18 +90,15 @@ jobs:
             echo "Deploying code to environment"
 workflows:
   version: 2
-  test_build:
-    jobs:
-      - test
-      - build:
-          requires:
-            - test
- test_deploy:
+  test_build_deploy:
     jobs:
       - hold:
           type: approval
           requires:
             - test
+      - build:
+          requires:
+            - hold
       - deploy-prod:
           filters:
             branches:
