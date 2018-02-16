@@ -103,7 +103,7 @@ workflows:
             - test
       - build:
           requires:
-            - hold
+            - test
       - deploy-prod:
           filters:
             branches:
